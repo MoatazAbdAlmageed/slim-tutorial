@@ -16,25 +16,21 @@ use Psr\Http\Message\ServerRequestInterface as RequestInterface;
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function addUsers(?ContainerInterface $container, ResponseInterface $response): array
+function addUsers(ContainerInterface $container)
 {
     inform('adding users ....');
     $sql = "INSERT INTO users (`name`, `email`, `phone`) VALUES (:name, :email, :phone)";
     $stmt = $container->get('connection')->prepare($sql);
     $settings = $container->get('settings');
-    for ($x = 0; $x <= $settings['rows']; $x++) {
-        $x++;
+
+    for ($x = 1; $x <= $settings['rows']; $x++) {
         $name = 'User' . $x;
         $email = 'user' . $x . '@gmail.com';
         $phone = '01150064746';
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-        $result = $stmt->execute();
+        $stmt->execute([':name' => $name, ':email' => $email, ':phone' => $phone]);
     }
-
-    return array($sql, $stmt, $x, $name, $result);
 }
+
 
 /**
  * @param ContainerInterface|null $container
@@ -43,22 +39,20 @@ function addUsers(?ContainerInterface $container, ResponseInterface $response): 
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function addProducts(?ContainerInterface $container, ResponseInterface $response): array
+function addProducts(ContainerInterface $container)
 {
     inform('adding products ....');
     $sql = "INSERT INTO products (`name`) VALUES (:name)";
     $stmt = $container->get('connection')->prepare($sql);
     $settings = $container->get('settings');
 
-    for ($x = 0; $x <= $settings['rows']; $x++) {
-        $x++;
-        $name = "Product $x";
-        $stmt->bindParam(':name', $name);
-        $result = $stmt->execute();
+    for ($x = 1; $x <= $settings['rows']; $x++) {
+        $name = "Product " . strval($x);
+        $stmt->execute([':name' => $name]);
     }
 
-    return array($sql, $stmt, $x, $result);
 }
+
 
 function inform($message)
 {
@@ -72,27 +66,22 @@ function inform($message)
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function addTransactions(?ContainerInterface $container, ResponseInterface $response): void
+function addTransactions(ContainerInterface $container): void
 {
     inform('adding transactions ....');
     $sql = "INSERT INTO transactions (`user_id`,`product_id`,`amount`) VALUES (:user_id,:product_id,:amount)";
     $stmt = $container->get('connection')->prepare($sql);
-
-
-    $amount = 200;
-
-
-    $stmt->bindParam(':amount', $amount);
     $settings = $container->get('settings');
-    for ($x = 0; $x <= $settings['rows']; $x++) {
-        $x++;
+    for ($x = 1; $x <= $settings['rows']; $x++) {
         $user_id = $x;
-        $stmt->bindParam(':user_id', $user_id);
         $product_id = $x;
-        $stmt->bindParam(':product_id', $product_id);
-        $result = $stmt->execute();
+        $amount = 200;
+        $stmt->execute([
+            ':user_id' => $user_id,
+            ':product_id' => $product_id,
+            ':amount' => $amount,
+        ]);
     }
-
 }
 
 /**
@@ -101,7 +90,7 @@ function addTransactions(?ContainerInterface $container, ResponseInterface $resp
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
  */
-function createtables(?ContainerInterface $container): void
+function createTables(?ContainerInterface $container): void
 {
     inform('creating tables ....');
     $container->get('connection')->exec(' 
@@ -120,10 +109,10 @@ return function (App $app) {
     $app->get('/install', function (RequestInterface $request, ResponseInterface $response, $args) use ($container) {
 
         try {
-            createtables($container);
-            addUsers($container, $response);
-            addProducts($container, $response);
-            addTransactions($container, $response);
+            createTables($container);
+            addUsers($container);
+            addProducts($container);
+            addTransactions($container);
 
             return $response
                 ->withHeader('content-type', 'application/json')
