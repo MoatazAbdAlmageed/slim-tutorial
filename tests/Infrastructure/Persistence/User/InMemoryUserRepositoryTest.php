@@ -29,7 +29,7 @@ class InMemoryUserRepositoryTest extends TestCase
     }
 
     /**
-     * @expectedException \App\Domain\User\UserNotFoundException
+     * @expectedException UserNotFoundException
      */
     public function testFindUserOfIdThrowsNotFoundException()
     {

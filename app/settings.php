@@ -6,9 +6,10 @@ use DI\Container;
 use Monolog\Logger;
 
 return function (Container $container) {
-    $container->set('settings', function() {
+    $container->set('settings', function () {
         return [
             'name' => 'Example Slim Application',
+            'rows' => 50,
             'displayErrorDetails' => true,
             'logErrorDetails' => true,
             'logErrors' => true,
@@ -22,7 +23,7 @@ return function (Container $container) {
                 'settings' => ['cache' => false],
             ],
             'connection' => [
-                'host' => 'slim_db_1',
+                'host' => 'db',
                 'dbname' => 'db',
                 'dbuser' => 'user',
                 'dbpass' => 'secret',

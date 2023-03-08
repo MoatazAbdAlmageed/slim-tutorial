@@ -6,7 +6,6 @@ use DI\Container;
 use Slim\Factory\AppFactory;
 
 require __DIR__ . '/../vendor/autoload.php';
-
 $container = new Container();
 
 $settings = require __DIR__ . '/../app/settings.php';
@@ -14,6 +13,7 @@ $settings($container);
 
 $connection = require __DIR__ . '/../app/connection.php';
 $connection($container);
+
 
 $logger = require __DIR__ . '/../app/logger.php';
 $logger($container);
@@ -23,6 +23,7 @@ AppFactory::setContainer($container);
 
 // Create App
 $app = AppFactory::create();
+$app->addErrorMiddleware(true, true, true);
 
 $views = require __DIR__ . '/../app/views.php';
 $views($app);
